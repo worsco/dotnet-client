@@ -27,8 +27,7 @@ mkdir -p $HOME/Development/rhel8-entitlements/
 cd $HOME/Development/rhel8-entitlements/
 ```
 10. You need to make a copy of the *.pem file as *-key.pem
-
-* We will be downloading an RHEL8 image, so you need to log into registry.redhat.io
+    * We will be downloading an RHEL8 container image, you need to log into registry.redhat.io
 
 ```
 podman login registry.redhat.io
@@ -102,10 +101,3 @@ Build the app and create the .nupgk artifact
 ./build.sh
 ./build.sh QuickPack
 ```
-
-File is located at:
-
-```
-  Successfully created package '/opt/app-root/src/dotnet-client/src/Infinispan.HotRod/bin/RelWithDebInfo/Infinispan.HotRod.8.2.0-Alpha2.nupkg'.
-```
-
