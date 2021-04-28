@@ -1,0 +1,112 @@
+# EXPERIMENT with rhel8/dotnet-21
+
+## pod entitled build (can be performed on RHEL7/RHEL8/FC host)
+
+### You need an entitlement for a RHEL8 system
+
+* Create a System in https://access.redhat.com/
+* Click on "Subscriptions"
+* Click on "Systems"
+* Click on "New"
+* System Type: [x] Virutal SYstem
+* Name: rhel8-container
+* Architecture: x86_64
+* Number of vCPUs: 2
+* Red Hat Enterprise Linux Version: 8
+* Click on "CREATE"
+
+* Attach a subscription to that system
+* My example: Employee SKU
+* "Download Certificates" link is now available
+
+* Download the entitlement file (.zip file)
+
+* Expand the contents of the .zip
+* Inside is a file named consumer_export.zip
+* Export the /export/entitlement_certificates/*.pem file into $HOME/Development/rhel8-entitlements/
+```
+mkdir -p $HOME/Development/rhel8-entitlements/
+cd $HOME/Development/rhel8-entitlements/
+```
+
+* We will be downloading an entitled image, so you need to log into registry.redhat.io
+
+```
+podman login registry.redhat.io
+```
+
+* The pod will be run as root, and also needs "--privileged" so that we can mount the volume when SELinux is enabled.
+
+```
+podman run --privileged -it --user=root --name=rhel8-dotnet-21 \
+-v $HOME/Development/rhel8-entitlements/:/etc/pki/entitlement \
+registry.redhat.io/rhel8/dotnet-21 \
+/bin/bash
+```
+
+* You are now inside of the pod.
+
+* Disable the mounting of the host's certs
+If you don't remove the /etc/rhsm-host mount, you will not be able to use the entitlement as the entitlement will conflict with the ca provided by the host.
+  
+```
+rm /etc/rhsm-host
+```
+
+Install EPEL repo
+
+```
+dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+```
+
+Enable EPEL repo
+
+```
+dnf config-manager --set-enabled epel
+```
+
+Enable RHEL8 repos
+
+```
+dnf config-manager --set-enabled rhel-8-for-x86_64-baseos-rpms
+dnf config-manager --set-enabled rhel-8-for-x86_64-appstream-rpms
+```
+
+Import the EPEL8 gpg signing key
+
+```
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+```
+
+Install necessary RPMs to build
+
+```
+dnf install -y git unzip wget gcc-c++ cyrus-sasl-devel mono-winfx mono-wcf mono-devel swig cpio
+```
+
+Clone repo that has code fixes
+
+```
+git clone https://github.com/worsco/dotnet-client
+cd dotnet-client
+```
+
+Switch to the branch for RHEL8
+
+```
+git checkout rhel8
+```
+
+Build the app and create the .nupgk artifact
+
+```
+./build.sh
+./build.sh QuickPack
+```
+
+File is located at:
+
+```
+  Successfully created package '/opt/app-root/src/dotnet-client/src/Infinispan.HotRod/bin/RelWithDebInfo/Infinispan.HotRod.8.2.0-Alpha2.nupkg'.
+```
+
