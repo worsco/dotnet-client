@@ -20,6 +20,7 @@
    * Download the entitlement file (.zip file)
 8. Create a directory for the entitlement *.pem and *-key.pem (we will be copying the *.pem file and creating *-key.pem from it)
 ```
+
 mkdir -p $HOME/Development/rhel8-entitlements/
 cd $HOME/Development/rhel8-entitlements/
 
@@ -31,6 +32,7 @@ cd $HOME/Development/rhel8-entitlements/
 11. Log into registry.redhat.io as we will be downloading a container that requires a valid Red Hat account.
 
 ```
+
 podman login registry.redhat.io
 
 ```
@@ -38,6 +40,7 @@ podman login registry.redhat.io
 * The pod will be run as root, and also needs "--privileged" (when SELinux is enabled) so that we can mount the directory that contains the entitlement within the pod.
 
 ```
+
 podman run --privileged -it --user=root --name=rhel8-dotnet-21 \
 -v $HOME/Development/rhel8-entitlements/:/etc/pki/entitlement \
 registry.redhat.io/rhel8/dotnet-21 \
@@ -51,6 +54,7 @@ registry.redhat.io/rhel8/dotnet-21 \
 If you don't remove the /etc/rhsm-host mount, you will not be able to use the entitlement as the entitlement will conflict with the ca provided by the host.
   
 ```
+
 rm /etc/rhsm-host
 
 ```
@@ -58,6 +62,7 @@ rm /etc/rhsm-host
 Install EPEL repo
 
 ```
+
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
 ```
@@ -65,6 +70,7 @@ dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarc
 Enable EPEL repo
 
 ```
+
 dnf config-manager --set-enabled epel
 
 ```
@@ -72,6 +78,7 @@ dnf config-manager --set-enabled epel
 Enable RHEL8 repos
 
 ```
+
 dnf config-manager --set-enabled rhel-8-for-x86_64-baseos-rpms
 dnf config-manager --set-enabled rhel-8-for-x86_64-appstream-rpms
 
@@ -80,6 +87,7 @@ dnf config-manager --set-enabled rhel-8-for-x86_64-appstream-rpms
 Import the EPEL8 gpg signing key
 
 ```
+
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
 
 ```
@@ -87,6 +95,7 @@ rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
 Install necessary RPMs to build
 
 ```
+
 dnf install -y git unzip wget gcc-c++ cyrus-sasl-devel mono-winfx mono-wcf mono-devel swig cpio
 
 ```
@@ -94,6 +103,7 @@ dnf install -y git unzip wget gcc-c++ cyrus-sasl-devel mono-winfx mono-wcf mono-
 Clone repo that has code fixes
 
 ```
+
 git clone https://github.com/worsco/dotnet-client
 cd dotnet-client
 
@@ -102,6 +112,7 @@ cd dotnet-client
 Switch to the branch for RHEL8
 
 ```
+
 git checkout rhel8
 
 ```
@@ -109,6 +120,7 @@ git checkout rhel8
 Build the app and create the .nupgk artifact
 
 ```
+
 ./build.sh
 ./build.sh QuickPack
 
