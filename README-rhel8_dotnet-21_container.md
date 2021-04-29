@@ -18,19 +18,21 @@
    * My example: Employee SKU
 7. "Download Certificates" link is now available
    * Download the entitlement file (.zip file)
-8. Expand the contents of the .zip
-9. Inside is a file named `consumer_export.zip`
-   * Export the `/export/entitlement_certificates/*.pem` file into `$HOME/Development/rhel8-entitlements/`
-
+8. Create a directory for the entitlement *.pem and *-key.pem (we will be copying the *.pem file and creating *-key.pem from it)
 ```
 mkdir -p $HOME/Development/rhel8-entitlements/
 cd $HOME/Development/rhel8-entitlements/
+
 ```
+8. Expand the contents of the downloaded subscription file (it's a long number with dashes ending with .zip)
+9. Inside is a file named `consumer_export.zip`
+   * Export the `/export/entitlement_certificates/*.pem` file into `$HOME/Development/rhel8-entitlements/`
 10. You need to have two files in the $HOME/Development/rhel8-entitlements/, the *.pem, and a copy of that same file with *-key.pem ('-key' appended the the filename)
-11. We will be downloading an RHEL8 container image, you need to log into registry.redhat.io
+11. Log into registry.redhat.io as we will be downloading a container that requires a valid Red Hat account.
 
 ```
 podman login registry.redhat.io
+
 ```
 
 * The pod will be run as root, and also needs "--privileged" (when SELinux is enabled) so that we can mount the directory that contains the entitlement within the pod.
@@ -40,6 +42,7 @@ podman run --privileged -it --user=root --name=rhel8-dotnet-21 \
 -v $HOME/Development/rhel8-entitlements/:/etc/pki/entitlement \
 registry.redhat.io/rhel8/dotnet-21 \
 /bin/bash
+
 ```
 
 * You are now "root" inside of the pod.
@@ -49,18 +52,21 @@ If you don't remove the /etc/rhsm-host mount, you will not be able to use the en
   
 ```
 rm /etc/rhsm-host
+
 ```
 
 Install EPEL repo
 
 ```
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
 ```
 
 Enable EPEL repo
 
 ```
 dnf config-manager --set-enabled epel
+
 ```
 
 Enable RHEL8 repos
@@ -68,18 +74,21 @@ Enable RHEL8 repos
 ```
 dnf config-manager --set-enabled rhel-8-for-x86_64-baseos-rpms
 dnf config-manager --set-enabled rhel-8-for-x86_64-appstream-rpms
+
 ```
 
 Import the EPEL8 gpg signing key
 
 ```
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
 ```
 
 Install necessary RPMs to build
 
 ```
 dnf install -y git unzip wget gcc-c++ cyrus-sasl-devel mono-winfx mono-wcf mono-devel swig cpio
+
 ```
 
 Clone repo that has code fixes
@@ -87,12 +96,14 @@ Clone repo that has code fixes
 ```
 git clone https://github.com/worsco/dotnet-client
 cd dotnet-client
+
 ```
 
 Switch to the branch for RHEL8
 
 ```
 git checkout rhel8
+
 ```
 
 Build the app and create the .nupgk artifact
@@ -100,4 +111,5 @@ Build the app and create the .nupgk artifact
 ```
 ./build.sh
 ./build.sh QuickPack
+
 ```
