@@ -8,7 +8,7 @@
 2. Click on "Subscriptions"
 3. Click on "Systems"
 4. Click on "New"
-   * System Type: [x] Virutal SYstem
+   * System Type: [x] Virutal System
    * Name: rhel8-container
    * Architecture: x86_64
    * Number of vCPUs: 2
