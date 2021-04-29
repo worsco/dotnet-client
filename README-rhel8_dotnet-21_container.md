@@ -26,8 +26,8 @@
 mkdir -p $HOME/Development/rhel8-entitlements/
 cd $HOME/Development/rhel8-entitlements/
 ```
-10. You need to make a copy of the *.pem file as *-key.pem
-    * We will be downloading an RHEL8 container image, you need to log into registry.redhat.io
+10. You need to have two files in the $HOME/Development/rhel8-entitlements/, the *.pem, and a copy of that same file with *-key.pem ('-key' appended the the filename)
+11. We will be downloading an RHEL8 container image, you need to log into registry.redhat.io
 
 ```
 podman login registry.redhat.io
